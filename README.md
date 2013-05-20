@@ -14,5 +14,6 @@ also copy itself to /usr/libexec/centos-image-mod directory.
 
 it modifies:
 - initrd
-- elevator mode (noop by default)
-- redirects boot log from STDOUT to /dev/ttyS0
+- grub.conf
+ - elevator mode (noop by default)
+ - redirects boot log from STDOUT to /dev/ttyS0
