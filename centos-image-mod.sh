@@ -3,10 +3,9 @@
 # tested on CentOS 6.3 x86_64
 #
 # depends:
-# on cloud-utils, https://launchpad.net/cloud-utils 
-# script assumes you have 'growpart' accessible at location 
-# '/usr/lib/cloud-utils/bin/growpart'
-# change '$growpart_path' value if you need
+# cloud-utils, https://launchpad.net/cloud-utils 
+# add epel repo and install cloud-utils
+# also recommend you to install cloud-init (for openstack)
 #
 # adds:
 # - automatic partition and filesystem increase on root partition
@@ -16,7 +15,7 @@
 # log in openstack, change '$console' if you need
 # 
 elevator="noop"
-growpart_path="/usr/lib/cloud-utils/bin"
+growpart_path="/usr/bin"
 console="/dev/ttyS0"
 #
 #
