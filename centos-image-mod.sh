@@ -123,15 +123,7 @@ find ./ | cpio -H newc -o > /tmp/initrd.cpio
 gzip -c /tmp/initrd.cpio > /boot/initramfs-mod-${kernel_version}.img
 
 # grub; set root disk and partition number
-[ "${root_dev}" == "sda" ] && grub_disk=0
-[ "${root_dev}" == "sdb" ] && grub_disk=1
-[ "${root_dev}" == "sdc" ] && grub_disk=2
-[ "${root_dev}" == "sdd" ] && grub_disk=3
-[ $(echo ${root_dev} |sed "s/[^0-9]//g") == "1" ] && grub_part=0
-[ $(echo ${root_dev} |sed "s/[^0-9]//g") == "2" ] && grub_part=1
-[ $(echo ${root_dev} |sed "s/[^0-9]//g") == "3" ] && grub_part=2
-[ $(echo ${root_dev} |sed "s/[^0-9]//g") == "4" ] && grub_part=3
-root_grub=hd${grub_disk}","${grub_part}
+root_grub=$(cat /boot/grub/grub.conf |grep "root (hd")
 
 # modify grub menu
 echo "- setting up grub.conf"
