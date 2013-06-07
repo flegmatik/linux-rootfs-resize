@@ -89,6 +89,7 @@ exec agetty -h -L -w /dev/${console} 115200 vt102
 eof
 )
     echo "${console_file}" > /etc/init/${console}.conf
+    console="console=${console}"
 else
     unset console
 fi
