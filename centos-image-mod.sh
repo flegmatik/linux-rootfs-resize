@@ -20,7 +20,7 @@
 set_elevator=yes
 set_console=yes
 #
-install_dir=/usr/libexec/centos-mod
+install_dir=/usr/libexec/centos-image-mod
 elevator="noop"
 growpart_path="/usr/bin"
 console="ttyS0"
