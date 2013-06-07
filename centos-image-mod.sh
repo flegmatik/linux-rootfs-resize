@@ -30,7 +30,7 @@ console="ttyS0"
 function deps () {
     for file in ${@}; do
         [ ! -z $(echo $file |grep -o "$lib") ] && 
-            cp -v ${file $lib}/
+            cp -v ${file} ${lib}/
     done
 }
 
