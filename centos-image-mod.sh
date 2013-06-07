@@ -72,7 +72,7 @@ root_dev=$(echo ${root_part} |sed "s/[0-9]//g")
 
 # create centos-mod dir and copy scripts
 [ ! -d ${install_dir} ] && mkdir -p ${install_dir}
-cp centos-mod.sh init-part ${install_dir}/
+cp centos-image-mod.sh init-part ${install_dir}/
 
 # redirect console to ${console}
 if [ "${set_console}" == "yes" ]; then
