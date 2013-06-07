@@ -10,8 +10,11 @@ Add EPEL repo and install cloud-utils, or do it manually
 For Openstack, I also recommend you to install cloud-init
 
 SETUP:
-Run ./centos-image-mod.sh, it will modify initrd image and grub menu. It will 
-also copy itself to /usr/libexec/centos-image-mod directory.
+Run ./centos-image-mod.sh, it will modify initrd image and grub menu. 
+
+It will install itself to /usr/libexec/centos-image-mod directory, since 
+you need to run this after every kernel upgrade (if you wish to resize 
+partition again).
 
 it modifies:
 - initrd
