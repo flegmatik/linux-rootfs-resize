@@ -1,5 +1,5 @@
 #!/bin/dash
-# this should be called from 'init'; 'init-part <root partition>'
+# this should be called from 'init' in intrd image with 'init-part ${root}'
 root_part=$(echo ${1} |sed "s/block://")
 root_dev=$(readlink ${root_part}| sed "s/[^a-z]//g")
 part_num=$(readlink ${root_part}| sed "s/[^0-9]//g")
