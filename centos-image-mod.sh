@@ -74,26 +74,6 @@ root_dev=$(echo ${root_part} |sed "s/[0-9]//g")
 [ ! -d ${install_dir} ] && mkdir -p ${install_dir}
 cp centos-image-mod.sh init-part ${install_dir}/
 
-# redirect console to ${console}
-if [ "${set_console}" == "yes" ]; then
-    console_file=$(cat << eof
-# ${console} - agetty
-#
-# This service maintains a agetty on ${console}.
-
-stop on runlevel [S016]
-start on runlevel [23]
-
-respawn
-exec agetty -h -L -w /dev/${console} 115200 vt102
-eof
-)
-    echo "${console_file}" > /etc/init/${console}.conf
-    console="console=${console}"
-else
-    unset console
-fi
-
 # create backup of important files
 echo "- backing up grub.conf >> ${install_dir}/grub.conf.$(date +%Y%m%d-%H%M)"
 cp /boot/grub/grub.conf ${install_dir}/grub.conf.$(date +%Y%m%d-%H%M)
@@ -131,7 +111,27 @@ else
   unset elevator
 fi
 
-# grub; set root disk and partition number
+# set console redirect
+if [ "${set_console}" == "yes" ]; then
+    console_file=$(cat << eof
+# ${console} - agetty
+#
+# This service maintains a agetty on ${console}.
+
+stop on runlevel [S016]
+start on runlevel [23]
+
+respawn
+exec agetty -h -L -w /dev/${console} 115200 vt102
+eof
+)
+    echo "${console_file}" > /etc/init/${console}.conf
+    console="console=${console}"
+else
+    unset console
+fi
+
+# set grub root
 root_grub=$(cat /boot/grub/grub.conf |grep -v "^#" |grep -m1 -o "root (hd[0-9],[0-9])")
 
 # modify grub menu
