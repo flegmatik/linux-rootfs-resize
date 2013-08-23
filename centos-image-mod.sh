@@ -73,6 +73,8 @@ root_dev=$(echo ${root_part} |sed "s/[0-9]//g")
 # create centos-mod dir and copy scripts
 [ ! -d ${install_dir} ] && mkdir -p ${install_dir}
 cp centos-image-mod.sh init-part ${install_dir}/
+chmod 774 ${install_dir}/init-part
+chmod 774 ${install_dir}/centos-image-mod.sh
 
 # create backup of important files
 echo "- backing up grub.conf >> ${install_dir}/grub.conf.$(date +%Y%m%d-%H%M)"
