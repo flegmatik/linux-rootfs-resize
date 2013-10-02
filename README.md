@@ -8,6 +8,7 @@ DEPENDS:
 Depends on growpart tool https://launchpad.net/cloud-utils.
 Add EPEL repo and install cloud-utils, or do it manually
 For Openstack, I also recommend you to install cloud-init
+Partitioning: A single partition on the disk (/boot can not be seperate). LVM not supported.
 
 SETUP:
 Run ./centos-image-mod.sh, it will modify initrd image and grub menu. 
