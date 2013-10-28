@@ -1,0 +1,10 @@
+growroot()
+{
+  root_part=$(echo ${root} |sed "s/block://")
+  root_dev=$(readlink ${root_part}| sed "s/[^a-z]//g")
+  part_num=$(readlink ${root_part}| sed "s/[^0-9]//g")
+  growpart --fudge 20480 -v /dev/${root_dev} ${part_num}
+  e2fsck -f /dev/${root_dev}${part_num}
+  resize2fs /dev/${root_dev}${part_num}
+}
+

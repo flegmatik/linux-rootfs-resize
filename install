@@ -1,0 +1,55 @@
+#!/bin/bash
+#
+
+function deps () {
+  for file in ${@}; do
+    [ ! -z $(echo $file |grep -o "$lib") ] &&
+      [ ! -f /tmp/initrd${file} ] &&
+        echo "cp -v ${file} /tmp/initrd${file}"
+  done
+}
+
+copy-tools2() {
+  # copy needed tools and their dependencies into initrd structure
+  while read tool; do
+    toolpath=$(which ${tool})
+    [ $? != 0 ] && exit 1
+    echo "cp -v ${toolpath} bin/"
+    deps "($(ldd ${toolpath}))"
+  done <${inst_dir}/deps.lst
+}
+
+# store directory from where we run install
+inst_dir=$(pwd)
+
+# check distro and set distro specific variables
+distro=""
+[ -f /etc/redhat-release ] &&
+  if [[ "$(cat /etc/redhat-release)" == *CentOS\ release\ 6* ]]; then
+    distro="centos-6"
+    initrd="/boot/initramfs-$(uname -r).img"
+    initscript="init"
+  fi
+[ -f /etc/issue ] &&
+  if [[ "$(cat /etc/issue)" == *Debian\ GNU\/Linux\ 7* ]]; then
+    distro="debian-7"
+    initrd="/boot/initrd.img-$(uname -r)"
+    initscript="scripts/local"
+  fi
+
+# exit if distro is not supported
+if [ "${distro}" == "" ]; then
+  echo "Distribution NOT supported!"
+  exit 1
+fi
+
+# destroy existing tmp initrd and extract fresh one
+[ -d /tmp/initrd ] && rm -rf /tmp/initrd
+mkdir /tmp/initrd && cd /tmp/initrd
+gunzip -c ${initrd} | cpio -i --make-directories
+
+# modify initrd
+copy-tools2
+script=$(cat ${inst_dir}/distro/${distro}/mod)
+sed -i "/export PATH=/i \"${script}\"" ${initscript}
+

@@ -1,0 +1,20 @@
+growroot()
+{
+        echo "Resizing ${ROOT} partition to max available space ..."
+        root_dev=$(readlink ${ROOT}| sed "s/[^a-z]//g")
+        part_num=$(readlink ${ROOT}| sed "s/[^0-9]//g")
+        growpart --fudge 20480 -v /dev/${root_dev} ${part_num}
+        e2fsck -f /dev/${root_dev}${part_num}
+        resize2fs /dev/${root_dev}${part_num}
+}
+
+# call growroot() from mountroot(), just before this block:
+#
+# FIXME This has no error checking
+# Mount root
+if [ "${FSTYPE}" != "unknown" ]; then
+	mount ${roflag} -t ${FSTYPE} ${ROOTFLAGS} ${ROOT} ${rootmnt}
+else
+	mount ${roflag} ${ROOTFLAGS} ${ROOT} ${rootmnt}
+fi
+
