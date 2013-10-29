@@ -1,6 +1,21 @@
 centos-image-resize
 ===================
 
+ === OBSOLOTE ===
+ 
+For future updates check this project:
+
+https://github.com/flegmatik/linux-rootfs-resize.git
+
+New tool supports more distros
+
+
+
+
+
+
+
+
 Tool for resizing virtual machines during boot. I've made this tool for use 
 with Openstack.
 
