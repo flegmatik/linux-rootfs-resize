@@ -1,12 +1,18 @@
 #!/bin/bash
 #
+# by robert Plestenjak, robert.plestenjak@xlab.si
+#
+# depends on: cloud-utils
 
 function deps () {
   for file in ${@}; do
+    # check if is a valid file
     [ -f ${file} ] &&
+      # is this file new?
       if [ ! -f /tmp/initrd${file} ]; then
         cp -v ${file} /tmp/initrd${file}
         if [ $? != 0 ]; then
+          # error, bug out
           echo "Can't copy \"${file}\""
           exit 1
         fi
@@ -15,20 +21,26 @@ function deps () {
 }
 
 function copy-tools() {
-  # copy needed tools and their dependencies into initrd structure
+  # install files listed in deps.lst
   while read tool; do
+    # get tools path
     toolpath=$(which ${tool})
     if [ $? != 0 ]; then
+      # tool not installed, bug out
       echo "$tool not found! Please install"
       exit 1
     fi
+    # copy tool into initrd
     cp -v ${toolpath} bin/
+    # install needed libraries
     deps "($(ldd ${toolpath}))"
   done <${inst_dir}/deps.lst
 }
 
 initrd() {
+  # clean up
   [ -d /tmp/initrd ] && rm -rf /tmp/initrd
+  # create temp directory and move there
   mkdir /tmp/initrd && cd /tmp/initrd
   # extract current initrd
   gunzip -c ${initrd} | cpio -i --make-directories
@@ -51,15 +63,22 @@ grub-mod() {
       # clean existing mod
       grubby -o ${grub_config} --grub --remove-kernel=${kernel}-mod
       # create new mod
+      # soft link kernel
       [ ! -f ${kernel}-mod ] && ln -s ${kernel} ${kernel}-mod
+      # grub title
       grub_title="$(cat /etc/redhat-release) $(uname -r) mod"
+      # grub kernel (softlink)
       grub_kernel=${kernel}-mod
+      # modified initrd
       grub_initrd=${initrd}-mod
+      # modify grub config
       grubby -o ${grub_config} --grub --copy-default --add-kernel="${grub_kernel}" \
         --title="${grub_title}" --initrd="${grub_initrd}" --make-default
     ;;
     "grub2")
+      # soft link kernel
       [ ! -f ${kernel}-mod ] && ln -s ${kernel} ${kernel}-mod
+      # generate new grub2 config
       grub-mkconfig -o ${grub_config}
     ;;
   esac
@@ -70,6 +89,7 @@ inst_dir=$(pwd)
 
 # check distro and set distro specific variables
 distro=""
+# RedHat derivate
 [ -f /etc/redhat-release ] &&
   if [[ "$(cat /etc/redhat-release)" == *CentOS\ release\ 6* ]]; then
     distro="centos-6"
@@ -82,6 +102,7 @@ distro=""
     grub_config="/boot/grub/grub.conf"
     grub="grub1"
   fi
+# Debian derivate
 [ -f /etc/issue ] &&
   if [[ "$(cat /etc/issue)" == *Debian\ GNU\/Linux\ 7* ]]; then
     distro="debian-7"
@@ -111,7 +132,9 @@ if [ "${distro}" == "" ]; then
   exit 1
 fi
 
+# generate new initrd
 initrd
+# modify grub configuration
 grub-mod ${grub}
 
 exit 0
