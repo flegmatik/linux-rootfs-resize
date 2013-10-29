@@ -3,13 +3,18 @@
 
 function deps () {
   for file in ${@}; do
-    [ ! -z $(echo $file |grep -o "$lib") ] &&
-      [ ! -f /tmp/initrd${file} ] &&
+    [ -f ${file} ] &&
+      if [ ! -f /tmp/initrd${file} ]; then
         cp -v ${file} /tmp/initrd${file}
+        if [ $? != 0 ]; then
+          echo "Can't copy \"${file}\""
+          exit 1
+        fi
+      fi
   done
 }
 
-copy-tools() {
+function copy-tools() {
   # copy needed tools and their dependencies into initrd structure
   while read tool; do
     toolpath=$(which ${tool})
@@ -22,6 +27,44 @@ copy-tools() {
   done <${inst_dir}/deps.lst
 }
 
+initrd() {
+  [ -d /tmp/initrd ] && rm -rf /tmp/initrd
+  mkdir /tmp/initrd && cd /tmp/initrd
+  # extract current initrd
+  gunzip -c ${initrd} | cpio -i --make-directories
+  # modify
+  copy-tools
+  mod_file=${inst_dir}/distro/${distro}/mod
+  sed -i -e "/${proc_insert_point}/r ${mod_file}" -e "//N" ${init_script}
+  sed -i "/${call_insert_point}/a ${proc_name}" ${init_script}
+  # create new
+  find ./ | cpio -H newc -o > /tmp/initrd.cpio
+  gzip -c /tmp/initrd.cpio > ${initrd}-mod
+  # clean up
+  cd ${inst_dir}
+  rm -rf /tmp/initrd.cpio /tmp/initrd
+}
+
+grub-mod() {
+  case ${1} in
+    "grub1")
+      # clean existing mod
+      grubby -o ${grub_config} --grub --remove-kernel=${kernel}-mod
+      # create new mod
+      [ ! -f ${kernel}-mod ] && ln -s ${kernel} ${kernel}-mod
+      grub_title="$(cat /etc/redhat-release) $(uname -r) mod"
+      grub_kernel=${kernel}-mod
+      grub_initrd=${initrd}-mod
+      grubby -o ${grub_config} --grub --copy-default --add-kernel="${grub_kernel}" \
+        --title="${grub_title}" --initrd="${grub_initrd}" --make-default
+    ;;
+    "grub2")
+      [ ! -f ${kernel}-mod ] && ln -s ${kernel} ${kernel}-mod
+      grub-mkconfig -o ${grub_config}
+    ;;
+  esac
+}
+
 # store directory from where we run install
 inst_dir=$(pwd)
 
@@ -31,21 +74,35 @@ distro=""
   if [[ "$(cat /etc/redhat-release)" == *CentOS\ release\ 6* ]]; then
     distro="centos-6"
     initrd="/boot/initramfs-$(uname -r).img"
+    kernel="/boot/vmlinuz-$(uname -r)"
     init_script="init"
     proc_insert_point="^export PATH=.*"
     proc_name="growroot"
     call_insert_point="^source_all pre-mount"
+    grub_config="/boot/grub/grub.conf"
+    grub="grub1"
   fi
 [ -f /etc/issue ] &&
   if [[ "$(cat /etc/issue)" == *Debian\ GNU\/Linux\ 7* ]]; then
     distro="debian-7"
     initrd="/boot/initrd.img-$(uname -r)"
+    kernel="/boot/vmlinuz-$(uname -r)"
     init_script="scripts/local"
     proc_insert_point="^mountroot()"
     proc_name="\        growroot"
     call_insert_point="^.*modprobe \${FSTYPE}"
+    grub_config="/boot/grub/grub.cfg"
+    grub="grub2"
   elif [[ "$(cat /etc/issue)" == *Debian\ GNU\/Linux\ 6* ]]; then
     distro="debian-6"
+    initrd="/boot/initrd.img-$(uname -r)"
+    kernel="/boot/vmlinuz-$(uname -r)"
+    init_script="scripts/local"
+    proc_insert_point="^mountroot()"
+    proc_name="\        growroot"
+    call_insert_point="^.*modprobe \${FSTYPE}"
+    grub_config="/boot/grub/grub.cfg"
+    grub="grub2"
   fi
 
 # exit if distro is not supported
@@ -54,18 +111,7 @@ if [ "${distro}" == "" ]; then
   exit 1
 fi
 
-#
-# extract initrd image
-#
-[ -d /tmp/initrd ] && rm -rf /tmp/initrd
-mkdir /tmp/initrd && cd /tmp/initrd
-gunzip -c ${initrd} | cpio -i --make-directories
+initrd
+grub-mod ${grub}
 
-#
-# modify initrd image
-#
-copy-tools
-# modify init script
-mod_file=${inst_dir}/distro/${distro}/mod
-sed -i -e "/${proc_insert_point}/r ${mod_file}" -e "//N" ${init_script}
-sed -i "/${call_insert_point}/a ${proc_name}" ${init_script}
+exit 0
