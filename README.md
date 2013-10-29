@@ -1,7 +1,7 @@
 centos-image-resize
 ===================
 
- === OBSOLOTE ===
+ === OBSOLETE ===
  
 For future updates check this project:
 
