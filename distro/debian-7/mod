@@ -8,13 +8,3 @@ growroot()
         resize2fs /dev/${root_dev}${part_num}
 }
 
-# call growroot() from mountroot(), just before this block:
-#
-# FIXME This has no error checking
-# Mount root
-if [ "${FSTYPE}" != "unknown" ]; then
-	mount ${roflag} -t ${FSTYPE} ${ROOTFLAGS} ${ROOT} ${rootmnt}
-else
-	mount ${roflag} ${ROOTFLAGS} ${ROOT} ${rootmnt}
-fi
-

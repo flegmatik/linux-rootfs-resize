@@ -1,5 +1,5 @@
 growpart
 sfdisk
 e2fsck
-e2resize
+resize2fs
 sed

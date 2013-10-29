@@ -5,16 +5,19 @@ function deps () {
   for file in ${@}; do
     [ ! -z $(echo $file |grep -o "$lib") ] &&
       [ ! -f /tmp/initrd${file} ] &&
-        echo "cp -v ${file} /tmp/initrd${file}"
+        cp -v ${file} /tmp/initrd${file}
   done
 }
 
-copy-tools2() {
+copy-tools() {
   # copy needed tools and their dependencies into initrd structure
   while read tool; do
     toolpath=$(which ${tool})
-    [ $? != 0 ] && exit 1
-    echo "cp -v ${toolpath} bin/"
+    if [ $? != 0 ]; then
+      echo "$tool not found! Please install"
+      exit 1
+    fi
+    cp -v ${toolpath} bin/
     deps "($(ldd ${toolpath}))"
   done <${inst_dir}/deps.lst
 }
@@ -28,13 +31,21 @@ distro=""
   if [[ "$(cat /etc/redhat-release)" == *CentOS\ release\ 6* ]]; then
     distro="centos-6"
     initrd="/boot/initramfs-$(uname -r).img"
-    initscript="init"
+    init_script="init"
+    proc_insert_point="^export PATH=.*"
+    proc_name="growroot"
+    call_insert_point="^source_all pre-mount"
   fi
 [ -f /etc/issue ] &&
   if [[ "$(cat /etc/issue)" == *Debian\ GNU\/Linux\ 7* ]]; then
     distro="debian-7"
     initrd="/boot/initrd.img-$(uname -r)"
-    initscript="scripts/local"
+    init_script="scripts/local"
+    proc_insert_point="^mountroot()"
+    proc_name="\        growroot"
+    call_insert_point="^.*modprobe \${FSTYPE}"
+  elif [[ "$(cat /etc/issue)" == *Debian\ GNU\/Linux\ 6* ]]; then
+    distro="debian-6"
   fi
 
 # exit if distro is not supported
@@ -43,13 +54,18 @@ if [ "${distro}" == "" ]; then
   exit 1
 fi
 
-# destroy existing tmp initrd and extract fresh one
+#
+# extract initrd image
+#
 [ -d /tmp/initrd ] && rm -rf /tmp/initrd
 mkdir /tmp/initrd && cd /tmp/initrd
 gunzip -c ${initrd} | cpio -i --make-directories
 
-# modify initrd
-copy-tools2
-script=$(cat ${inst_dir}/distro/${distro}/mod)
-sed -i "/export PATH=/i \"${script}\"" ${initscript}
-
+#
+# modify initrd image
+#
+copy-tools
+# modify init script
+mod_file=${inst_dir}/distro/${distro}/mod
+sed -i -e "/${proc_insert_point}/r ${mod_file}" -e "//N" ${init_script}
+sed -i "/${call_insert_point}/a ${proc_name}" ${init_script}
