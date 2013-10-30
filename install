@@ -63,7 +63,7 @@ grub-mod() {
       # clean existing mod
       grubby -o ${grub_config} --grub --remove-kernel=${kernel}-mod
       # create new mod
-      # make a new copy of kernel (link is not enough if you use seperate boot partition)
+      # copy kernel
       [ ! -f ${kernel}-mod ] && cp ${kernel} ${kernel}-mod
       # grub title
       grub_title="$(cat /etc/redhat-release) $(uname -r) mod"
@@ -76,8 +76,8 @@ grub-mod() {
         --title="${grub_title}" --initrd="${grub_initrd}" --make-default
     ;;
     "grub2")
-      # soft link kernel
-      [ ! -f ${kernel}-mod ] && ln -s ${kernel} ${kernel}-mod
+      # copy kernel
+      [ ! -f ${kernel}-mod ] && cp ${kernel} ${kernel}-mod
       # generate new grub2 config
       grub-mkconfig -o ${grub_config}
     ;;
