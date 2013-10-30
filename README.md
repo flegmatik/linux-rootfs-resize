@@ -17,6 +17,8 @@ LIMITATIONS:
 
     for now, tool can only resize NON LVM partition (it DOES NOT support LVM!)
 
+UNDER DEVELOPMENT: I've begun working on LVM functionality. I commited code for CentOS LVM volumes, but haven't tested it yet properly. Still experimental stage.
+
 INSTALL: Install git, clone this project on your machine, make 'install' executable and run it.
 
 On CentOS:
