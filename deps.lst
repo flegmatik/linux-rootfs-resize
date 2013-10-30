@@ -4,3 +4,4 @@ e2fsck
 resize2fs
 sed
 awk
+partx
