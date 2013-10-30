@@ -63,8 +63,8 @@ grub-mod() {
       # clean existing mod
       grubby -o ${grub_config} --grub --remove-kernel=${kernel}-mod
       # create new mod
-      # soft link kernel
-      [ ! -f ${kernel}-mod ] && ln -s ${kernel} ${kernel}-mod
+      # make a new copy of kernel (link is not enough if you use seperate boot partition)
+      [ ! -f ${kernel}-mod ] && cp ${kernel} ${kernel}-mod
       # grub title
       grub_title="$(cat /etc/redhat-release) $(uname -r) mod"
       # grub kernel (softlink)
