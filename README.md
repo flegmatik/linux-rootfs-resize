@@ -22,7 +22,7 @@ INSTALL: Install git, clone this project on your machine, make 'install' executa
 On CentOS:
 
     yum install git
-    git clone
+    git clone https://github.com/flegmatik/linux-rootfs-resize.git
     cd linux-rootfs-resize
     chmod +x install
     ./install
