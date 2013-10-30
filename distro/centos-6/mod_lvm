@@ -1,0 +1,7 @@
+growroot()
+{
+  echo "Resizing roofs to available space ..."
+  root_lv=$(echo ${root} |sed "s/block://")
+  lvm lvresize -v -r -l +100%FREE ${root_lv}
+}
+

@@ -27,7 +27,7 @@ function copy-tools() {
     toolpath=$(which ${tool})
     if [ $? != 0 ]; then
       # tool not installed, bug out
-      echo "$tool not found! Please install"
+      echo "\"${tool}\" not found! Please install"
       exit 1
     fi
     # copy tool into initrd
@@ -46,7 +46,8 @@ initrd() {
   gunzip -c ${initrd} | cpio -i --make-directories
   # modify
   copy-tools
-  mod_file=${inst_dir}/distro/${distro}/mod
+  touch etc/mtab
+  mod_file=${inst_dir}/distro/${distro}/${mod_type}
   sed -i -e "/${proc_insert_point}/r ${mod_file}" -e "//N" ${init_script}
   sed -i "/${call_insert_point}/a ${proc_name}" ${init_script}
   # create new
@@ -84,11 +85,30 @@ grub-mod() {
   esac
 }
 
+function partition-type() {
+  LVM=0
+  # check for logical volumes
+  if [[ "$(lvs --noheadings -o +lv_path)" != *No\ volume\ groups\ found* ]]; then
+    # get rootfs mount device
+    rootfs_device=$(mount |grep -o "^.* / " |awk '{print $1}')
+    # look for match, set LVM true if found
+    for lv_name in $(lvs --noheading |awk '{print $1}'); do
+      [[ "${rootfs_device}" == *${lv_name}* ]] && LVM=1
+    done
+  fi
+  return ${LVM}
+}
+
 # store directory from where we run install
 inst_dir=$(pwd)
 
+# set common variables
+partition-type
+[ $? -eq 1 ] && mod_type="mod_lvm" || mod_type="mod"
+
 # check distro and set distro specific variables
 distro=""
+
 # RedHat derivate
 [ -f /etc/redhat-release ] &&
   if [[ "$(cat /etc/redhat-release)" == *CentOS\ release\ 6* ]]; then
