@@ -47,7 +47,7 @@ initrd() {
   # modify
   copy-tools
   touch etc/mtab
-  sed -i "s/locking_type = 4/locking_type = 1/" etc/lvm/lvm.conf
+  sed -i "s/locking_type = 4/locking_type = 1/" /etc/lvm/lvm.conf
   mod_file=${inst_dir}/distro/${distro}/${mod_type}
   sed -i -e "/${proc_insert_point}/r ${mod_file}" -e "//N" ${init_script}
   sed -i "/${call_insert_point}/a ${proc_name}" ${init_script}

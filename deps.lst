@@ -5,3 +5,4 @@ resize2fs
 sed
 awk
 partx
+lvm2
