@@ -89,14 +89,18 @@ grub-mod() {
 
 function partition-type() {
   LVM=0
-  # check for logical volumes
-  if [[ "$(lvs --noheadings -o +lv_path)" != *No\ volume\ groups\ found* ]]; then
-    # get rootfs mount device
-    rootfs_device=$(mount |grep -o "^.* / " |awk '{print $1}')
-    # look for match, set LVM true if found
-    for lv_name in $(lvs --noheading |awk '{print $1}'); do
-      [[ "${rootfs_device}" == *${lv_name}* ]] && LVM=1
-    done
+  # check if LVM tool lvs is present
+  which lvs 2>&1 >/dev/null
+  if [ $? -eq 0 ]; then
+    # check for logical volumes
+    if [[ "$(lvs --noheadings -o +lv_path)" != *No\ volume\ groups\ found* ]]; then
+      # get rootfs mount device
+      rootfs_device=$(mount |grep -o "^.* / " |awk '{print $1}')
+      # look for match, set LVM true if found
+      for lv_name in $(lvs --noheading |awk '{print $1}'); do
+        [[ "${rootfs_device}" == *${lv_name}* ]] && LVM=1
+      done
+    fi
   fi
   return ${LVM}
 }
