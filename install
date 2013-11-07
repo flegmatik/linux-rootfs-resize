@@ -22,7 +22,6 @@ function deps () {
 
 function copy-tools() {
   # install files listed in deps.lst
-  initrd_path="bin sbin usr/bin usr/sbin"
   while read tool; do
     IN=0
     for bin_path in "${initrd_path}"; do
@@ -37,7 +36,7 @@ function copy-tools() {
         exit 1
       fi
       # copy tool into initrd
-      cp -v ${toolpath} /tmp/initrd${toolpath}
+      cp -v ${toolpath} bin/${tool}
       # install needed libraries
       deps "($(ldd ${toolpath}))"
     else
@@ -128,6 +127,7 @@ distro=""
 [ -f /etc/redhat-release ] &&
   if [[ "$(cat /etc/redhat-release)" == *CentOS\ release\ 6* ]]; then
     distro="centos-6"
+    initrd_path="bin sbin usr/bin usr/sbin"
     initrd="/boot/initramfs-$(uname -r).img"
     kernel="/boot/vmlinuz-$(uname -r)"
     init_script="init"
@@ -141,6 +141,7 @@ distro=""
 [ -f /etc/issue ] &&
   if [[ "$(cat /etc/issue)" == *Debian\ GNU\/Linux\ 7* ]]; then
     distro="debian-7"
+    initrd_path="bin sbin"
     initrd="/boot/initrd.img-$(uname -r)"
     kernel="/boot/vmlinuz-$(uname -r)"
     init_script="scripts/local"
@@ -151,6 +152,7 @@ distro=""
     grub="grub2"
   elif [[ "$(cat /etc/issue)" == *Debian\ GNU\/Linux\ 6* ]]; then
     distro="debian-6"
+    initrd_path="bin sbin"
     initrd="/boot/initrd.img-$(uname -r)"
     kernel="/boot/vmlinuz-$(uname -r)"
     init_script="scripts/local"
