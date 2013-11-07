@@ -25,7 +25,9 @@ Debian 6 and 7:
 
     for now, tool can only resize NON LVM partition (it DOES NOT support LVM!)
 
-INSTALL: Install git, clone this project on your machine, make 'install' executable and run it.
+INSTALL: 
+
+    Install git, clone this project on your machine, make 'install' executable and run it.
 
 On CentOS:
 
