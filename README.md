@@ -9,6 +9,10 @@ OpenStack cloud for the first time (your image becomes flavor aware)
 
 This code was successfuly tested on: CentOS 6.4, Debian 6 and Debian 7.2
 
+LIMITATIONS:
+
+    Roofs on extended partition is not tested/supported. So far my testing suggest that 'growpart' can't handle them!
+
 DEPENDENCIES:
 
     cloud-utils (https://launchpad.net/cloud-utils)
