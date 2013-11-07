@@ -3,7 +3,7 @@ linux-rootfs-resize
 
 Rework of my previous project, that was limited only to CentOS 6.x.
 
-This tool creates new initrd (initramfs) image with abbilitie to resize root filesystem 
+This tool creates new initrd (initramfs) image with ability to resize root filesystem 
 over available space. Tipically you need this when you provision your virtual machine on 
 OpenStack cloud for the first time (your image becomes flavor aware)
 
