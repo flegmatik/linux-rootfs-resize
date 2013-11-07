@@ -1,13 +1,19 @@
 growroot()
 {
-  echo "Resizing roofs to available space ..."
+  echo "[] linux-rootfs-resize ..."
   lvm_lv_root=$(echo ${root} |sed "s/block://")
   lvm_pv_path=$(lvm pvs --noheadings |awk '{print $1}')
   lvm_pv_temp=$(echo ${lvm_pv_path}|sed "s/dev//g")
   lvm_pv_dev=$(echo ${lvm_pv_temp}| sed "s/[^a-z]//g")
   lvm_pv_part=$(echo ${lvm_pv_temp}| sed "s/[^0-9]//g")
-  growpart --fudge 20480 -u auto -v /dev/${lvm_pv_dev} ${lvm_pv_part}
-  lvm pvresize -v ${lvm_pv_path}
-  lvm lvresize -v -r -l +100%FREE ${lvm_lv_root} ${lvm_pv_path}
+  growpart -v /dev/${lvm_pv_dev} ${lvm_pv_part}
+  if [ $? -eq 0 ]; then
+    partx -a ${lvm_pv_dev}
+    lvm pvresize -v ${lvm_pv_path}
+    lvm vgchange --sysinit -a y
+    lvm lvresize -v -l +100%FREE ${lvm_lv_root}
+    e2fsck -f ${lvm_lv_root}
+    resize2fs -p ${lvm_lv_root}
+  fi
 }
 

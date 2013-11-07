@@ -22,18 +22,27 @@ function deps () {
 
 function copy-tools() {
   # install files listed in deps.lst
+  initrd_path="bin sbin usr/bin usr/sbin"
   while read tool; do
-    # get tools path
-    toolpath=$(which ${tool})
-    if [ $? != 0 ]; then
-      # tool not installed, bug out
-      echo "\"${tool}\" not found! Please install"
-      exit 1
+    IN=0
+    for bin_path in "${initrd_path}"; do
+      [[ -f ${bin_path}/${tool} ]] && IN=1
+    done
+    if [ ${IN} -eq 0 ]; then
+      # get tools path
+      toolpath=$(command -v ${tool})
+      if [ $? != 0 ]; then
+        # tool not installed, bug out
+        echo "\"${tool}\" not found! Please install"
+        exit 1
+      fi
+      # copy tool into initrd
+      cp -v ${toolpath} /tmp/initrd${toolpath}
+      # install needed libraries
+      deps "($(ldd ${toolpath}))"
+    else
+      echo "${tool} present"
     fi
-    # copy tool into initrd
-    cp -v ${toolpath} bin/
-    # install needed libraries
-    deps "($(ldd ${toolpath}))"
   done <${inst_dir}/deps.lst
 }
 
@@ -158,9 +167,7 @@ if [ "${distro}" == "" ]; then
   exit 1
 fi
 
-# generate new initrd
 initrd
-# modify grub configuration
 grub-mod ${grub}
 
 exit 0
