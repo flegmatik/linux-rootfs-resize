@@ -7,23 +7,13 @@ This tool creates new initrd (initramfs) image with ability to resize root files
 over available space. Tipically you need this when you provision your virtual machine on 
 OpenStack cloud for the first time (your image becomes flavor aware)
 
+Rootfs on LVM is also supported.
+
 This code was successfuly tested on: CentOS 6.4, Debian 6 and Debian 7.2
-
-LIMITATIONS:
-
-    Roofs on extended partition is not tested/supported. So far my testing suggest that 'growpart' can't handle them!
 
 DEPENDENCIES:
 
     cloud-utils (https://launchpad.net/cloud-utils)
-
-CentOS 6:
-
-    supports physical and LVM partitions
-
-Debian 6 and 7:
-
-    for now, tool can only resize NON LVM partition (it DOES NOT support LVM!)
 
 INSTALL: 
 
