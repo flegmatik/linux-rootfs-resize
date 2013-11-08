@@ -1,6 +1,5 @@
 growroot()
 {
-	# under development: Alpha stage
         echo "[] linux-rootfs-resize ..."
         lvm_pv_path=$(lvm pvs --noheadings |awk '{print $1}')
         lvm_pv_temp=$(echo ${lvm_pv_path}|sed "s/dev//g")
