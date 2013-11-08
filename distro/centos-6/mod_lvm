@@ -8,7 +8,7 @@ growroot()
   lvm_pv_part=$(echo ${lvm_pv_temp}| sed "s/[^0-9]//g")
   growpart -v /dev/${lvm_pv_dev} ${lvm_pv_part}
   if [ $? -eq 0 ]; then
-    partx -a ${lvm_pv_dev}
+    partx -a $(echo ${lvm_pv_path} |sed -e "s/[0-9]//g")
     lvm pvresize -v ${lvm_pv_path}
     lvm vgchange --sysinit -a y
     lvm lvresize -v -l +100%FREE ${lvm_lv_root}
