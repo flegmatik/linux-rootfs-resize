@@ -29,4 +29,4 @@ On CentOS:
     chmod +x install
     ./install
 
-Tool is designed in modular fassion so support for other distributions can be added without much work (I hope).
+Tool is designed in modular fashion, so support for other distributions can be added without much work (I hope).
