@@ -12,7 +12,7 @@ growroot()
     lvm pvresize -v ${lvm_pv_path}
     lvm vgchange --sysinit -a y
     lvm lvresize -v -l +100%FREE ${lvm_lv_root}
-    e2fsck -f ${lvm_lv_root}
+    e2fsck -p -f ${lvm_lv_root}
     resize2fs -p ${lvm_lv_root}
   fi
 }
