@@ -6,7 +6,7 @@ growroot()
   growpart -v /dev/${root_dev} ${part_num}
   if [ $? -eq 0 ]; then
     partx -a /dev/${root_dev}
-    e2fsck -f /dev/${root_dev}${part_num}
+    e2fsck -p -f /dev/${root_dev}${part_num}
     resize2fs -p /dev/${root_dev}${part_num}
   fi
 }
