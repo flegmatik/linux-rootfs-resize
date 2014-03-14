@@ -1,13 +1,12 @@
 growroot()
 {
+  echo "[] linux-rootfs-resize ..."
   root_part=$(echo ${root} |sed "s/block://")
   root_dev=$(readlink ${root_part}| sed "s/[^a-z]//g")
   part_num=$(readlink ${root_part}| sed "s/[^0-9]//g")
   growpart -v /dev/${root_dev} ${part_num}
-  if [ $? -eq 0 ]; then
-    partx -a /dev/${root_dev}
-    e2fsck -p -f /dev/${root_dev}${part_num}
-    resize2fs -p /dev/${root_dev}${part_num}
-  fi
+  partprobe -s /dev/${root_dev}
+  e2fsck -p -f /dev/${root_dev}${part_num}
+  resize2fs -p /dev/${root_dev}${part_num}
 }
 

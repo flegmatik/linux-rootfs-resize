@@ -1,0 +1,7 @@
+growpart
+sfdisk
+e2fsck
+resize2fs
+sed
+awk
+partprobe

@@ -42,7 +42,7 @@ function copy-tools() {
     else
       echo "${tool} present"
     fi
-  done <${inst_dir}/deps.lst
+  done <${inst_dir}/distro/${distro}/deps
 }
 
 initrd() {
