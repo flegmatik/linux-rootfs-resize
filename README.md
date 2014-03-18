@@ -1,15 +1,15 @@
 linux-rootfs-resize
 ===================
 
-Rework of my previous project, that was limited only to CentOS 6.x.
+Supported Linux distributions: CentOS 6, Debian 6, Debian 7.
+
+Rework of my previous project, that was limited only to CentOS 6.
 
 This tool creates new initrd (initramfs) image with ability to resize root filesystem 
 over available space. Tipically you need this when you provision your virtual machine on 
 OpenStack cloud for the first time (your image becomes flavor aware)
 
-Root filesystem on LVM is also supported. 
-
-For now, filesystem resize is limited to ext2, ext3 and ext4 (resize2fs).
+For now, filesystem resize is limited to ext2, ext3 and ext4 (resize2fs) including LVM volumes.
 
 This code was successfuly tested on: CentOS 6.5, Debian 6 and Debian 7.2
 
