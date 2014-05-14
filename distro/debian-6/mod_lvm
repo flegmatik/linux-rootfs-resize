@@ -7,7 +7,7 @@ growroot()
         lvm_pv_dev=$(echo ${lvm_pv_temp}| sed "s/[^a-z]//g")
         lvm_pv_part=$(echo ${lvm_pv_temp}| sed "s/[^0-9]//g")
         echo "${lvm_pv_dev} ${lvm_pv_part}"
-        growpart -v -u auto /dev/${lvm_pv_dev} ${lvm_pv_part}
+        growpart -v /dev/${lvm_pv_dev} ${lvm_pv_part}
         lvm pvresize -v ${lvm_pv_path}
         lvm vgchange --sysinit -ay
         lvm lvextend -v -l +100%FREE ${ROOT}
