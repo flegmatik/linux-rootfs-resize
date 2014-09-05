@@ -128,8 +128,19 @@ distro=""
   if [[ "$(cat /etc/redhat-release)" == *CentOS\ release\ 6* ]]; then
     distro="centos-6"
     initrd_path="bin sbin usr/bin usr/sbin"
-    initrd="/boot/initramfs-$(uname -r).img"
-    kernel="/boot/vmlinuz-$(uname -r)"
+    kernel_version=$(uname -r)
+    if [ -f /boot/initramfs-$kernel ]
+    then
+      initrd="/boot/initramfs-$(uname -r).img"
+      kernel="/boot/vmlinuz-$(uname -r)"
+    else
+      # this assumes that a box has just been built and there is only a single
+      # kernel and initramfs, which kinda sucks, but not sure how to handle
+      # multiple initramfs or kernels that might be present - which one is the
+      # 'real' one?
+      initrd=$(ls /boot/initramfs*)
+      kernel=$(ls /boot/vmlinuz-*)
+    fi
     init_script="init"
     proc_insert_point="^export PATH=.*"
     proc_name="growroot"
