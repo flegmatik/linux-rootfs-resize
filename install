@@ -129,7 +129,7 @@ distro=""
     distro="centos-6"
     initrd_path="bin sbin usr/bin usr/sbin"
     kernel_version=$(uname -r)
-    if [ -f /boot/initramfs-$kernel ]
+    if [ -f /boot/initramfs-${kernel_version}.img ]
     then
       initrd="/boot/initramfs-$(uname -r).img"
       kernel="/boot/vmlinuz-$(uname -r)"
